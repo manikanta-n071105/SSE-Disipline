@@ -1,11 +1,13 @@
 "use client";
 
+import RequireRoleGender from "@/components/RequireRole";
 import StudentPage from "@/components/StudentPage";
 
-// your existing code
 
 export default function StudentProtected() {
   return (
-      <StudentPage />
+    <RequireRoleGender allowedRoles={["STUDENT"]} allowedGenders={["FEMALE","MALE"]}>
+            <StudentPage />
+    </RequireRoleGender>
   );
 }

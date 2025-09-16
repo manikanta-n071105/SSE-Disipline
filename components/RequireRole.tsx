@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 
 interface RequireRoleGenderProps {
   children: ReactNode;
-  allowedRoles: ("ADMIN" | "STUDENT" | "WARDEN"|"WATCHMAN"|"SUPER")[];
+  allowedRoles: ("ADMIN" | "STUDENT" | "WARDEN" | "WATCHMAN" | "SUPER")[];
   allowedGenders?: ("MALE" | "FEMALE")[];
+  allowedTypes?: ("HOSTELER" | "DAY_SCHOLAR")[];
 }
 
 export default function RequireRoleGender({
   children,
   allowedRoles,
   allowedGenders,
+  allowedTypes,
 }: RequireRoleGenderProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -22,11 +24,12 @@ export default function RequireRoleGender({
       !loading &&
       (!user ||
         !allowedRoles.includes(user.role) ||
-        (allowedGenders && user.gender && !allowedGenders.includes(user.gender)))
+        (allowedGenders && user.gender && !allowedGenders.includes(user.gender)) ||
+        (allowedTypes && user.type && !allowedTypes.includes(user.type)))
     ) {
       router.push("/unauthorized");
     }
-  }, [user, loading, router, allowedRoles, allowedGenders]);
+  }, [user, loading, router, allowedRoles, allowedGenders, allowedTypes]);
 
   if (loading || !user) return <p>Loading...</p>;
 

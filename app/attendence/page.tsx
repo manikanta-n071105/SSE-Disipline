@@ -1,11 +1,15 @@
 "use client";
 
 import AttendancePage from "@/components/Attendence";
+import RequireRoleGender from "@/components/RequireRole";
 
 // your existing code
 
 export default function AttendenceProtected() {
   return (
-        <AttendancePage />
+    <RequireRoleGender allowedRoles={["ADMIN"]}>
+      <AttendancePage />
+    </RequireRoleGender>
+        
   );
 }

@@ -28,15 +28,38 @@ export default function LoginPage() {
         password,
       });
 
-      // signIn returns an object when redirect: false
       if (res?.error) {
         setError(res.error || "Invalid credentials");
         setLoading(false);
         return;
       }
 
-      // success: redirect to dashboard or intended page
-      router.push("/profile");
+      // ✅ fetch session to get role
+      const sessionRes = await fetch("/api/auth/session");
+      const session = await sessionRes.json();
+
+      const role = session?.user?.role;
+
+      // role-based redirects
+      switch (role) {
+        case "STUDENT":
+          router.push("/student");
+          break;
+        case "ADMIN":
+          router.push("/admin");
+          break;
+        case "WARDEN":
+          router.push("/warden");
+          break;
+        case "WATCHMAN":
+          router.push("/watchman");
+          break;
+        case "SUPER":
+          router.push("/super");
+          break;
+        default:
+          router.push("/unauthorized");
+      }
     } catch (err) {
       console.error(err);
       setError("An unexpected error occurred. Try again.");
@@ -67,7 +90,9 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-black mb-1">Email</label>
+            <label className="block text-sm font-medium text-black mb-1">
+              Email
+            </label>
             <input
               type="email"
               value={email}
@@ -80,7 +105,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-black mb-1">Password</label>
+            <label className="block text-sm font-medium text-black mb-1">
+              Password
+            </label>
             <input
               type="password"
               value={password}
@@ -95,35 +122,15 @@ export default function LoginPage() {
           <button
             type="submit"
             className={`w-full py-3 rounded-lg font-medium transition ${
-              loading ? "bg-blue-400 cursor-wait" : "bg-blue-600 hover:bg-blue-700"
+              loading
+                ? "bg-blue-400 cursor-wait"
+                : "bg-blue-600 hover:bg-blue-700"
             } text-white`}
             disabled={loading}
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
-
-        {/* extra actions */}
-        <div className="mt-6">
-          <div className="flex items-center">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="px-3 text-sm text-black/70">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-
-          {/* If you use OAuth, enable this button and configure provider */}
-          {/* <button className="mt-4 w-full border border-gray-300 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-50">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><path ... /></svg>
-            Sign in with Google
-          </button> */}
-
-          <p className="mt-4 text-sm text-black/75 text-center">
-            Don't have an account?{" "}
-            <a href="/register" className="text-blue-600 hover:underline">
-              Register
-            </a>
-          </p>
-        </div>
       </div>
     </div>
   );

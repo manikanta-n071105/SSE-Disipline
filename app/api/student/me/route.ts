@@ -1,28 +1,19 @@
 // app/api/student/me/route.ts
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; 
 import { prisma } from "@/lib/db";
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
-
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const token = authHeader.split(" ")[1];
-
-    let decoded: { id: string };
-    try {
-      decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-    } catch {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
     const student = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { id: session.user.id },
       include: {
         complaintsAsStudent: {
           orderBy: { createdAt: "desc" },

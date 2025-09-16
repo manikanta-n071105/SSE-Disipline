@@ -7,8 +7,10 @@ import type { Session } from "next-auth";
 // Context type
 interface AuthContextType {
   user: (Session["user"] & {
-    role: "ADMIN" | "STUDENT" | "WARDEN"|"WATCHMAN"|"SUPER";
-    gender: "MALE" | "FEMALE"| null;
+    role: "ADMIN" | "STUDENT" | "WARDEN" | "WATCHMAN" | "SUPER";
+    gender: "MALE" | "FEMALE" | null;
+    type: "HOSTELER" | "DAY_SCHOLAR" | null;
+    department?: string | null;
   }) | null;
   loading: boolean;
 }

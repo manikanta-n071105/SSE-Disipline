@@ -1,11 +1,15 @@
 "use client";
 
+import RequireRoleGender from "@/components/RequireRole";
 import WardenHostelPage from "@/components/Warden";
 
  // your existing code
 
 export default function DetailsProtected() {
   return (
-        <WardenHostelPage/>
+        <RequireRoleGender allowedRoles={["WARDEN"]} allowedTypes={["HOSTELER"]}>
+           <WardenHostelPage/>
+        </RequireRoleGender>
+       
   );
 }
