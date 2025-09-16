@@ -109,6 +109,7 @@ export default function RegisterPage() {
             <option value="ECE">ECE</option>
             <option value="EEE">EEE</option>
             <option value="MECH">MECH</option>
+            <option value="CIVIL">Civil</option>
           </select>
 
           {/* ✅ Gender Enum */}
