@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 // GET all hostel submissions for a student
 export async function GET(req: NextRequest) {
   try {
@@ -25,21 +26,38 @@ export async function GET(req: NextRequest) {
 // PUT to update 'submit' (admin action)
 export async function PUT(req: NextRequest) {
   try {
+    // ✅ get ID from URL
     const url = new URL(req.url);
     const idStr = url.pathname.split("/").pop();
-    if (!idStr) return NextResponse.json({ message: "ID not found" }, { status: 400 });
+    if (!idStr) {
+      return NextResponse.json({ message: "ID not found" }, { status: 400 });
+    }
+    const id = parseInt(idStr, 10);
 
-    const id = parseInt(idStr); // Hostel ID is Int
+    // ✅ get session user
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
 
+    // ✅ update with submit + approvedby
     const updated = await prisma.hostel.update({
       where: { id },
-      data: { submit: body.submit },
+      data: {
+        submit: body.submit ?? false,
+        approvedby: session.user.name || "Unknown",
+      },
     });
 
     return NextResponse.json(updated);
   } catch (err: any) {
-    return NextResponse.json({ message: "PUT error", error: err.message }, { status: 500 });
+    console.error("PUT error:", err);
+    return NextResponse.json(
+      { message: "PUT error", error: err.message },
+      { status: 500 }
+    );
   }
 }
 

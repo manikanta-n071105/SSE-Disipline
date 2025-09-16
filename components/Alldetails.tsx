@@ -10,6 +10,8 @@ interface HostelSubmission {
   photo: string;
   comeoutTime: string | null;
   comeinTime: string | null;
+  approvedby?: string | null;
+
   hostel: {
     name: string;
     email: string;
@@ -22,17 +24,26 @@ export default function HostelDetailsPage() {
   const [filterSubmit, setFilterSubmit] = useState<boolean | "all">("all");
 
   const fetchSubmissions = async () => {
-    try {
-      const res = await fetch("/api/hostel/create");
-      const data: HostelSubmission[] = await res.json();
+  try {
+    const res = await fetch("/api/hostel/create");
+    const data = await res.json();
+
+    // Ensure it's always an array
+    if (Array.isArray(data)) {
       setSubmissions(data);
-    } catch (err) {
-      toast.error("Failed to fetch hostel submissions.");
-      setSubmissions([]);
-    } finally {
-      setLoading(false);
+    } else if (data && Array.isArray(data.hostels)) {
+      // If your API wraps it (e.g. { hostels: [...] })
+      setSubmissions(data.hostels);
+    } else {
+      setSubmissions([]); // fallback
     }
-  };
+  } catch (err) {
+    toast.error("Failed to fetch hostel submissions.");
+    setSubmissions([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchSubmissions();
@@ -91,6 +102,8 @@ export default function HostelDetailsPage() {
                 <th className="px-4 py-2">Number</th>
                 <th className="px-4 py-2">Submitted</th>
                 <th className="px-4 py-2">Returned</th>
+               <th className="px-4 py-2">ApprovedBy</th>
+
                 <th className="px-4 py-2">Come Out Time</th>
                 <th className="px-4 py-2">Come In Time</th>
               </tr>
@@ -126,6 +139,8 @@ export default function HostelDetailsPage() {
                       <span className="text-red-600 font-semibold">No</span>
                     )}
                   </td>
+                                    <td className="px-4 py-2">{s.approvedby}</td>
+
                   <td className="px-4 py-2">
                     {s.comeoutTime ? new Date(s.comeoutTime).toLocaleString() : "-"}
                   </td>

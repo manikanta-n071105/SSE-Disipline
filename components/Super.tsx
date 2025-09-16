@@ -13,6 +13,7 @@ interface Complaint {
   photo: string;
   reason: string;
   createdAt: string;
+  approvedBy:string;
 }
 
 interface User {
@@ -29,6 +30,8 @@ interface HostelSubmission {
   returned: boolean;
   number: string;
   photo: string;
+    approvedby?: string | null;
+
   comeoutTime: string | null;
   comeinTime: string | null;
   hostel: {

@@ -16,7 +16,7 @@ import {
   Home,
   Calendar,
 } from "lucide-react";
-import HostelForm from "./HostelComplaint"; // Make sure this is your HostelForm component
+import HostelProtected from "@/app/hostelcomplaint/page"; // Hostel form component
 import ViewTimetablePage from "@/app/time/page";
 
 type Attendance = {
@@ -49,6 +49,7 @@ type Student = {
   name: string;
   email: string;
   department: string;
+  type: "HOSTELER" | "DAY_SCHOLAR";
   complaintsAsStudent?: Complaint[];
 };
 
@@ -73,25 +74,31 @@ export default function StudentPage() {
     }
 
     if (status === "authenticated" && session?.user) {
-      const token = (session as any).accessToken || ""; // if you pass JWT token from NextAuth
+      const token = (session as any).accessToken || ""; // JWT token if used
       const fetchData = async () => {
         try {
+          // Fetch student data
           const resStudent = await fetch(`/api/student/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (!resStudent.ok) throw new Error("Unauthorized");
-          const studentData = await resStudent.json();
+          const studentData: Student = await resStudent.json();
           setStudent(studentData);
 
-          const resAttendance = await fetch(`/api/attendence/student/${studentData.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          // Attendance
+          const resAttendance = await fetch(
+            `/api/attendence/student/${studentData.id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
           setAttendance(resAttendance.ok ? await resAttendance.json() : []);
 
-          const resHostel = await fetch(`/api/hostel/${studentData.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setHostels(resHostel.ok ? await resHostel.json() : []);
+          // Hostel requests (only fetch if HOSTELER)
+          if (studentData.type === "HOSTELER") {
+            const resHostel = await fetch(`/api/hostel/${studentData.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setHostels(resHostel.ok ? await resHostel.json() : []);
+          }
 
           setLoading(false);
         } catch (err) {
@@ -125,7 +132,10 @@ export default function StudentPage() {
   const menuItems = [
     { key: "attendance", label: "Attendance", icon: <BookOpen size={18} /> },
     { key: "complaints", label: "Complaints", icon: <AlertTriangle size={18} /> },
-    { key: "hostel", label: "Hostel", icon: <Home size={18} /> },
+    // Show hostel only if HOSTELER
+    ...(student.type === "HOSTELER"
+      ? [{ key: "hostel", label: "Hostel", icon: <Home size={18} /> }]
+      : []),
     { key: "timetable", label: "Timetable", icon: <Calendar size={18} /> },
   ];
 
@@ -250,7 +260,7 @@ export default function StudentPage() {
             </div>
           )}
 
-          {activeSection === "hostel" && (
+          {activeSection === "hostel" && student.type === "HOSTELER" && (
             <div>
               <div className="flex justify-center mb-4">
                 <button
@@ -261,7 +271,7 @@ export default function StudentPage() {
                 </button>
               </div>
 
-              {showHostelForm && <HostelForm />}
+              {showHostelForm && <HostelProtected />}
 
               <div className="mt-4">
                 <h3 className="font-semibold text-purple-700 mb-2">
