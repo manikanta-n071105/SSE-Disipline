@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { QrCode, X, Trash2, Trash } from "lucide-react";
+import { QrCode, X, Trash } from "lucide-react";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 const QrReader = dynamic(() => import("react-qr-reader"), { ssr: false });
 
@@ -13,7 +14,7 @@ interface Complaint {
   photo: string;
   reason: string;
   createdAt: string;
-  approvedBy:string;
+  approvedBy: string;
 }
 
 interface User {
@@ -30,8 +31,7 @@ interface HostelSubmission {
   returned: boolean;
   number: string;
   photo: string;
-    approvedby?: string | null;
-
+  approvedby?: string | null;
   comeoutTime: string | null;
   comeinTime: string | null;
   hostel: {
@@ -41,6 +41,7 @@ interface HostelSubmission {
 }
 
 export default function AdminHostelPage() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<"users" | "hostel">("users");
 
   /*** USERS PAGE STATES ***/
@@ -60,11 +61,9 @@ export default function AdminHostelPage() {
   /*** FETCH USERS ***/
   useEffect(() => {
     if (activeTab !== "users") return;
-    const token = localStorage.getItem("token");
-    if (!token) {
-      window.location.replace("/user/signin");
-      return;
-    }
+    if (!session) return;
+
+    const token = session?.user?.id; // using session data as identifier/token substitute
 
     fetch(`/api/admin/users?email=${search}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -72,7 +71,7 @@ export default function AdminHostelPage() {
       .then((res) => res.json())
       .then((data) => setUsers(data))
       .catch((err) => console.error("Error:", err));
-  }, [search, activeTab]);
+  }, [search, activeTab, session]);
 
   /*** FETCH HOSTEL SUBMISSIONS ***/
   const fetchSubmissions = async () => {
@@ -143,7 +142,6 @@ export default function AdminHostelPage() {
   /*** DELETE COMPLAINT HANDLER ***/
   const handleDeleteComplaint = async (userId: string, complaintId: string) => {
     try {
-      console.log("Deleting complaint:", complaintId, "for user:", userId);
       const res = await fetch(`/api/complaint/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -308,58 +306,34 @@ export default function AdminHostelPage() {
                       <td className="p-2 break-words">{u.email}</td>
                       <td className="p-2">{u.department}</td>
                       <td className="p-2">
-  {u.complaintsAsStudent.length > 0 ? (
-    <ul className="list-disc ml-5">
-      {u.complaintsAsStudent
-        .filter((c) => isInRange(c.createdAt))
-        .map((c) => (
-          <li key={c.id} className="flex items-center gap-2">
-            <span className="font-medium">{c.reason}</span>{" "}
-            ({new Date(c.createdAt).toLocaleDateString()})
-            
-            {/* Delete button */}
-            <button
-              onClick={async () => {
-                console.log("🗑️ Trying to delete complaint:", c.id);
-                const res = await fetch("/api/complaint/delete", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ complaintId: c.id }),
-                });
-
-                if (res.ok) {
-                  toast.success("Complaint deleted ✅");
-
-                  // Update UI after delete
-                  setUsers((prev) =>
-                    prev.map((user) =>
-                      user.id === u.id
-                        ? {
-                            ...user,
-                            complaintsAsStudent: user.complaintsAsStudent.filter(
-                              (comp) => comp.id !== c.id
-                            ),
-                          }
-                        : user
-                    )
-                  );
-                } else {
-                  const err = await res.json();
-                  toast.error("Delete failed ❌: " + err.error);
-                }
-              }}
-              className="text-red-600 hover:text-red-800 ml-2"
-            >
-              <Trash />
-            </button>
-          </li>
-        ))}
-    </ul>
-  ) : (
-    <span className="text-gray-500">No complaints 🎉</span>
-  )}
-</td>
-
+                        {u.complaintsAsStudent.length > 0 ? (
+                          <ul className="list-disc ml-5">
+                            {u.complaintsAsStudent
+                              .filter((c) => isInRange(c.createdAt))
+                              .map((c) => (
+                                <li
+                                  key={c.id}
+                                  className="flex items-center gap-2"
+                                >
+                                  <span className="font-medium">{c.reason}</span>{" "}
+                                  ({new Date(c.createdAt).toLocaleDateString()})
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteComplaint(u.id, c.id)
+                                    }
+                                    className="text-red-600 hover:text-red-800 ml-2"
+                                  >
+                                    <Trash />
+                                  </button>
+                                </li>
+                              ))}
+                          </ul>
+                        ) : (
+                          <span className="text-gray-500">
+                            No complaints 🎉
+                          </span>
+                        )}
+                      </td>
                     </tr>
                   ))
                 ) : (
