@@ -1,32 +1,39 @@
-# 📌 SSE-SMS 
-A role-based complaint management system built with **Next.js, TypeScript, React, PostgreSQL, and Prisma**.  
-This project is designed for **tracking latecomers, shoe/beard violations, and other hostel/student-related issues**.  
-Each student has a **unique QR code** (printed on their ID card). By scanning this QR code, admins can instantly fetch the student’s details and raise complaints.  
+# 📌 Student Management System (SMS)
+
+A **role-based student management and complaint system** built with **Next.js, React, TypeScript, Prisma ORM, PostgreSQL, TailwindCSS, NextAuth.js, and JWT**.  
+This system streamlines hostel and academic management with **secure authentication, QR-based profiles, complaint tracking, and approval workflows**.
+
+---
 
 ## 🚀 Features
 
-- 🔐 **Authentication & Authorization**  
-  - Signup & Signin with **role-based access** (Admin, Student).  
-  - Protected routes based on user roles.  
+- 🔐 **Authentication & Authorization**
+  - Role-Based Access Control (RBAC) for **Student, Admin, Warden, Watchman, and SuperAdmin**
+  - Secure login with **NextAuth.js + JWT**
 
-- 🎫 **Unique QR Codes**  
-  - Each student gets a QR code linked to their profile.  
-  - QR scan fetches real-time student details.  
+- 🎫 **QR-Based Student Profiles**
+  - Unique QR codes for each student
+  - Instant profile retrieval for attendance, timetable, outpass, and complaints
 
-- 📋 **Complaint System**  
-  - Admins can raise complaints (latecomers, beard, shoes, etc.).  
-  - Complaints linked directly to student profiles.  
+- 📋 **Complaint Management**
+  - Raise complaints (latecomers, beard/shoe violations, hostel issues, etc.)
+  - Complaints linked to student profiles with history tracking
 
-- 📊 **Student Profiles**  
-  - Store and retrieve complete student information.  
-  - Complaints history tracking.  
+- 📊 **Admin Dashboard**
+  - Approvals, complaint resolution, and activity logs
+  - Real-time updates with **PostgreSQL + Prisma ORM**
+
+- ⚡ **Scalable Sessions**
+  - Optimized for **2.5k+ users** with **99.9% uptime**
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: [Next.js](https://nextjs.org/), [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/)  
-- **Backend**: API Routes in Next.js  
-- **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)  
-- **Authentication**: JWT / Role-based Access Control  
-- **QR Code**: QR generation & scanning for student identification
+- **Frontend:** [Next.js](https://nextjs.org/), [React](https://react.dev/), [TailwindCSS](https://tailwindcss.com/), [TypeScript](https://www.typescriptlang.org/)
+- **Backend:** API Routes in Next.js
+- **Database:** [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
+- **Authentication:** [NextAuth.js](https://next-auth.js.org/) with JWT
+- **Others:** QR Code Generation & Scanning
+
+---
