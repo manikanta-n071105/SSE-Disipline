@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
-export default function LoginPage() {
+export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -147,6 +148,17 @@ export default function LoginPage() {
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        {/* signup link */}
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Don’t have an account?{" "}
+          <Link
+            href="/user/signup"
+            className="text-purple-600 font-medium hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );

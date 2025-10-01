@@ -22,7 +22,7 @@ const DEFAULT_PHOTO = "https://via.placeholder.com/150.png?text=No+Photo";
 export default function AdminPage() {
   const [students, setStudents] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [reason, setReason] = useState("beard");
+  const [reason, setReason] = useState("Beard");
   const [photo, setPhoto] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const [scanning, setScanning] = useState(false);
@@ -178,7 +178,7 @@ export default function AdminPage() {
       </div>
 
       {/* Desktop nav (always visible) */}
-      <div className="hidden sm:flex fixed top-4 right-6 bg-purple-200 text-purple-900 shadow-lg py-2 px-4 gap-4 rounded-xl z-40">
+      <div className="hidden sm:flex fixed top-15 right-6 bg-purple-200 text-purple-900 shadow-lg py-2 px-4 gap-4 rounded-xl z-40">
         <button
           onClick={() => router.push("/users")}
           className="flex items-center gap-2 px-3 py-2 rounded hover:bg-purple-300"

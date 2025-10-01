@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -144,6 +145,14 @@ export default function RegisterPage() {
             {loading ? "Registering..." : "Register"}
           </button>
         </form>
+
+        {/* 🔗 Login link */}
+        <p className="text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link href="/user/signin" className="text-purple-600 font-medium hover:underline">
+            Login here
+          </Link>
+        </p>
       </div>
     </div>
   );
